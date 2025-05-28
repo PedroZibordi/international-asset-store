@@ -1,0 +1,53 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuário
+// Representa um usuário da loja (comprador, vendedor, administrador).
+model User {
+  id        String    @id @default(uuid()) // ID único para o usuário, gerado automaticamente como UUID.
+  email     String    @unique // E-mail único para login.
+  password  String    // Senha do usuário (hash, nunca armazene em texto puro!).
+  name      String?   // Nome do usuário, opcional.
+  createdAt DateTime  @default(now()) // Data de criação do registro, default é a data/hora atual.
+  updatedAt DateTime  @updatedAt // Data da última atualização do registro.
+  assets    Asset[]   // Relação 1-para-M: Um usuário pode ter muitos assets que ele vende.
+  purchases Purchase[] // Relação 1-para-M: Um usuário pode ter muitas compras.
+}
+
+// Modelo de Asset (Produto Digital)
+// Representa um asset digital (personagem, ambiente, ícone, etc.).
+model Asset {
+  id          String    @id @default(uuid()) // ID único do asset.
+  title       String    // Título do asset.
+  description String    // Descrição detalhada do asset.
+  price       Float     // Preço do asset (usando Float para moedas).
+  imageUrl    String    // URL da imagem de preview do asset (em um serviço de armazenamento).
+  fileUrl     String    // URL do arquivo principal do asset para download.
+  category    String    // Categoria do asset (ex: "Characters", "Environments", "UI").
+  tags        String[]  // Lista de tags para facilitar a busca (ex: ["fantasy", "knight"]).
+  sellerId    String    // ID do usuário que está vendendo este asset.
+  seller      User      @relation(fields: [sellerId], references: [id]) // Relação M-para-1: Um asset pertence a um vendedor.
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  purchases   Purchase[] // Relação 1-para-M: Um asset pode estar em muitas compras.
+}
+
+// Modelo de Compra
+// Registra uma transação de compra de um asset.
+model Purchase {
+  id        String   @id @default(uuid()) // ID único da compra.
+  userId    String   // ID do usuário que fez a compra.
+  user      User     @relation(fields: [userId], references: [id]) // Relação M-para-1: Uma compra pertence a um usuário.
+  assetId   String   // ID do asset comprado.
+  asset     Asset    @relation(fields: [assetId], references: [id]) // Relação M-para-1: Uma compra está relacionada a um asset.
+  amount    Float    // Valor da compra (pode ser diferente do preço atual do asset no futuro, se houver promoções).
+  purchaseDate DateTime @default(now()) // Data da compra.
+}
