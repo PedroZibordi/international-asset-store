@@ -34,7 +34,7 @@ export default async function AssetsPage() {
     // Faz a requisição para a nossa API de listagem de assets.
     // É importante usar o caminho completo da URL (http://localhost:3000)
     // porque este fetch é feito no servidor Next.js.
-    const res = await fetch('http://localhost:3000/api/assets', {
+    const res = await fetch('http://localhost:3001/api/assets', {
       cache: 'no-store' // Garante que os dados são sempre frescos (não usa cache do Next.js).
                             // Em produção, você pode considerar 'revalidate: 60' para revalidar a cada 60 segundos.
     });

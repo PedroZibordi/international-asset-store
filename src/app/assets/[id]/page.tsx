@@ -33,7 +33,7 @@ export default async function AssetDetailPage({ params }: { params: { id: string
 
   try {
     // Faz a requisição para a nossa API de busca de asset por ID.
-    const res = await fetch(`http://localhost:3000/api/assets/${id}`, {
+    const res = await fetch(`http://localhost:3001/api/assets/${id}`, {
       cache: 'no-store'
     });
 
